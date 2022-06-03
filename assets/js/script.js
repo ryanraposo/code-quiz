@@ -80,22 +80,31 @@ function onClickBtnSubmitHighScore() {
 }
 // *Utility
 function initializeQuiz() {
-  const qa1 = new QA("What day is it?", ["Monday", "Tuesday", "Wednesday"], 2);
-  const qa2 = new QA("What city are we in?", ["New York", "Toronto", "Chicago"], 1);
+  const qa1 = new QA("Bootstrap is a _____.", ["Python package", "Popular CSS framework", "Programming language"], 1);
+  const qa2 = new QA("'GitHub and Git are the same thing.'", ["True", "False"], 1);
+  const qa3 = new QA("What is Rust?", ["Programming language", "Linux distro", "Iron oxide"], 0);
   
-  QAs.push(qa1, qa2)
+  QAs.push(qa1, qa2, qa3)
 }
 
 function beginQuiz() {
+  initializeQuiz();
   startTimer();
   QuizView();
 }
 
 function initializeGame() {
   const highScoresLinkEl = document.getElementById("high-scores-link")
-  highScoresLinkEl.onclick = () => {HighScoresView()};
+  highScoresLinkEl.onclick = () => {
+    initializeTimer();
+    HighScoresView();
+  };
+  const homeLinkEl = document.getElementById("home-link");
+  homeLinkEl.onclick = () => {
+    initializeTimer();
+    StartView();
+  };
   score = 0;
-  initializeQuiz();
   initializeTimer();
   StartView();
 }
@@ -197,6 +206,7 @@ function HighScoresView() {
   for (const name in savedScoresObj) {
     const highScore = savedScoresObj[name];
     const highScoreEl = document.createElement("li");
+    highScoreEl.setAttribute("id", "high-score");
     highScoreEl.innerText = name.concat(" : ", highScore);
     scoresListEl.appendChild(highScoreEl);
   }
@@ -218,6 +228,7 @@ function tickTimer() {
 }
 
 function initializeTimer() {
+  timerOn = false;
   time = MAXTIME;
   window.clearInterval(timerId);
   timerId = window.setInterval(tickTimer, 1000);
