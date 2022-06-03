@@ -1,4 +1,4 @@
-const MAXTIME = 10;
+const MAXTIME = 50;
 
 var time;
 var timerOn = false;
@@ -45,6 +45,9 @@ function onClickBtnPossibleAnswer(isCorrect) {
   if (isCorrect) {
     score += 1;
   }
+  else {
+    time -= 5;
+  }
   QAs.shift()
 
   if (QAs.length === 0) {
@@ -54,6 +57,26 @@ function onClickBtnPossibleAnswer(isCorrect) {
   
   QuizView();
   
+}
+
+function onClickBtnSubmitHighScore() {
+  const inputInitialsEl = document.getElementById('input-initials');
+  const initials = inputInitialsEl.value;
+
+  const scores = localStorage.getItem('scores');
+  let scoresObj = JSON.parse(scores);
+
+  if (scoresObj === null) {
+    scoresObj = {};
+  } 
+
+  scoresObj[initials] = score;
+
+  score = 0;
+
+  localStorage.setItem("scores", JSON.stringify(scoresObj))
+  
+  HighScoresView();
 }
 // *Utility
 function initializeQuiz() {
@@ -69,6 +92,8 @@ function beginQuiz() {
 }
 
 function initializeGame() {
+  const highScoresLinkEl = document.getElementById("high-scores-link")
+  highScoresLinkEl.onclick = () => {HighScoresView()};
   score = 0;
   initializeQuiz();
   initializeTimer();
@@ -79,6 +104,20 @@ function gameOver() {
   stopTimer();
   EndView();
 }
+
+function sortScores(scoresObj) {
+  // credit: Ashutosh Ranjan https://stackoverflow.com/users/6825501/ashutosh-ranjan
+  const sorted = Object.entries(scoresObj)
+  .sort(([, v1], [, v2]) => v1 - v2)
+  .reduce((obj, [k, v]) => ({
+    ...obj,
+    [k.toString()]: v
+  }), {})
+
+  return sorted;
+
+}
+   
 // *Views
 function EndView() {
 
@@ -91,12 +130,23 @@ function EndView() {
   const endTextEl = document.createElement("p");
   endTextEl.innerText = "Your score was: " + score.toString();
 
+  const inputInitialsEl = document.createElement("input");
+  inputInitialsEl.id = "input-initials";
+  inputInitialsEl.placeholder = "Enter your initials";
+
+  const btnSubmitHighScore = document.createElement("button");
+  btnSubmitHighScore.innerText = "Submit"
+  btnSubmitHighScore.addEventListener("click", onClickBtnSubmitHighScore);
+
   const btnRestartEl = document.createElement("button");
   btnRestartEl.innerText = "Restart"
   btnRestartEl.addEventListener("click", onClickBtnRestart);
 
+
   main.appendChild(endHeaderEl);
   main.appendChild(endTextEl);
+  main.appendChild(inputInitialsEl);
+  main.appendChild(btnSubmitHighScore);
   main.appendChild(btnRestartEl);
 
 }
@@ -127,6 +177,31 @@ function StartView() {
   main.innerHTML += header;
   main.innerHTML += description;
   main.innerHTML += btnPlay;
+
+}
+
+function HighScoresView() {
+  
+  let main = document.getElementById("main");
+  main.innerHTML = '';
+
+  let scoresListEl = document.createElement("ul");
+  scoresListEl.setAttribute("id", "scores-list")
+  
+  const savedScores = localStorage.getItem("scores");
+  const savedScoresObj = JSON.parse(savedScores);
+  if (savedScoresObj === null){
+    savedScoresObj = {}
+  }
+
+  for (const name in savedScoresObj) {
+    const highScore = savedScoresObj[name];
+    const highScoreEl = document.createElement("li");
+    highScoreEl.innerText = name.concat(" : ", highScore);
+    scoresListEl.appendChild(highScoreEl);
+  }
+
+  main.appendChild(scoresListEl);
 
 }
 // *Timer
