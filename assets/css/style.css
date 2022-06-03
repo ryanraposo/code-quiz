@@ -2,3 +2,9 @@ header {
     display: flex;
     justify-content: space-between;
 }
+
+#answer-list {
+    display: flex;
+    flex-flow: column;
+    width: 50%;
+}

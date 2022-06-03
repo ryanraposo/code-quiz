@@ -162,15 +162,20 @@ function EndView() {
 
 function QuizView() {
 
-  let main = document.getElementById("main");
+  const main = document.getElementById("main");
   main.innerHTML = '';
+
+  const answerListEl = document.createElement("div");
+  answerListEl.setAttribute("id", "answer-list");
 
   const qa = QAs[0];
 
-  main.appendChild(qa.questionEl);
+  answerListEl.appendChild(qa.questionEl);
   qa.answersEl.forEach((answer) => {
-    main.appendChild(answer);
+    answerListEl.appendChild(answer);
   })
+
+  main.appendChild(answerListEl);
 
 }
 
@@ -180,7 +185,7 @@ function StartView() {
   main.innerHTML = '';
 
   const header = '<h1>Let\'s play!</h1>'
-  const description = '<p>Click below to begin</p>'
+  const description = '<p>Click below to begin.</p>'
   const btnPlay = "<button id='btn-start' onclick='onClickBtnStart()'>Start</button>"
 
   main.innerHTML += header;
